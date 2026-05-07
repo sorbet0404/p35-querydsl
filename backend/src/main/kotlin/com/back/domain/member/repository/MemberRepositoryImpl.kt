@@ -3,7 +3,10 @@ package com.back.domain.member.repository
 import com.back.domain.member.entity.Member
 import com.back.domain.member.entity.QMember
 import com.back.standard.enums.MemberSearchKeywordType
+import com.back.standard.enums.MemberSearchSortType
 import com.querydsl.core.BooleanBuilder
+import com.querydsl.core.types.Order
+import com.querydsl.core.types.OrderSpecifier
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -218,6 +221,24 @@ class MemberRepositoryImpl(
         val query = jpaQueryFactory
             .selectFrom(member)
             .where(builder)
+
+        pageable.sort.forEach { order ->
+            val path = when (order.property.lowercase()) {
+                MemberSearchSortType.ID.property -> member.id
+                MemberSearchSortType.USERNAME.property -> member.username
+                MemberSearchSortType.NICKNAME.property -> member.nickname
+                else -> null
+            }
+
+            path?.let { property ->
+                OrderSpecifier(
+                    if (order.isAscending) Order.ASC else Order.DESC,
+                    property
+                ).also {
+                    query.orderBy(it)
+                }
+            }
+        }
 
         val content = query
             .offset(pageable.offset)
