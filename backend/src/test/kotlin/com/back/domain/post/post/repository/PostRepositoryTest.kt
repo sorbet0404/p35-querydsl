@@ -35,6 +35,16 @@ class PostRepositoryTest {
 
         val content = postPage.content
 
+        // 게시물이 100개
+        println(content[0].title)
+        println(content[1].title)
+        println(content[2].title)
+
+        // 각 게시물 작성자가 다 서로 다르다고 할 때
+        // 100번의 회원 조회 쿼리 발생
+        println(content[0].author.nickname)
+        println(content[2].author.nickname)
+
         assertThat(content).isNotEmpty
     }
 }

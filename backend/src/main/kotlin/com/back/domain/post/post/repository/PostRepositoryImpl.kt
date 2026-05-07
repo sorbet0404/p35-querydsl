@@ -1,5 +1,4 @@
 package com.back.domain.post.post.repository
-
 import com.back.domain.post.post.entity.Post
 import com.back.domain.post.post.entity.QPost
 import com.back.standard.enums.PostSearchKeywordType
@@ -36,6 +35,7 @@ class PostRepositoryImpl(
 
         val query = jpaQuery
             .selectFrom(post)
+            .join(post.author).fetchJoin()
             .where(builder)
 
         pageable.sort.forEach { order ->
