@@ -3,9 +3,12 @@ package com.back.domain.member.service
 import com.back.domain.member.entity.Member
 import com.back.domain.member.repository.MemberRepository
 import com.back.global.exception.ServiceException
+import com.back.standard.enums.MemberSearchKeywordType
+import com.back.standard.enums.MemberSearchSortType
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -64,8 +67,15 @@ class MemberService(
             throw ServiceException("401-2", "비밀번호가 일치하지 않습니다.")
         }
     }
-    fun findByPaged(page: Int, pageSize: Int, kw: String): Page<Member> {
-        val pagable = PageRequest.of(page-1, pageSize)
-        return memberRepository.findByKwPaged(kw, pagable)
+    fun findByPaged(page: Int, pageSize: Int, kw: String, kwType: MemberSearchKeywordType, sort: MemberSearchSortType): Page<Member> {
+        val pagable = PageRequest.of(
+            page - 1,
+            pageSize,
+            if (sort.isAscending)
+                Sort.by(sort.property).ascending()
+            else
+                Sort.by(sort.property).descending()
+        )
+        return memberRepository.findByKwPaged(kw, kwType, pagable)
     }
 }
